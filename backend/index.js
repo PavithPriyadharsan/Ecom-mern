@@ -6,12 +6,14 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const dotenv = require("dotenv")
+dotenv.config();
 
 app.use(express.json());
 app.use(cors());
 
 //database connection
-mongoose.connect("");
+mongoose.connect(process.env.MONGO_URL);
 
 
 app.get("/", (req, res) => {
@@ -33,7 +35,7 @@ app.use('/images', express.static('upload/images'))
 app.post("/upload", upload.single('product'), (req, res) => {
     res.json({
         success: 1,
-        image_url: `http://localhost:${port}/upload/${req.file.filename}`
+        image_url: `http://localhost:${port}/images/${req.file.filename}`
     })
 })
 
@@ -115,7 +117,6 @@ app.post('/removeproduct', async(req, res)=> {
 //Api endpoint to get all products
 app.get('/allproducts', async(req, res)=> {
     let products = await Product.find({});
-    console.log("All products fetched");
     res.send(products);
 })
 
@@ -190,7 +191,54 @@ app.post('/login', async(req, res)=> {
     } else {
         res.json({success: false, error: "Invalid Email address"})
     }
-}) 
+})
+
+//endpoint for latest products
+app.get('/newcollections', async(req,res)=> {
+    let products = await Product.find({});
+    let newcollection = products.slice(1).slice(-8);
+    res.send(newcollection);
+})
+
+
+const fetchUser = ((req, res)=> {
+    const token = req.header('auth-token');
+    if(!token){
+        res.status(400).send({errors: "Please authenticate using valid login"})
+    } else {
+        try{
+            const data = jwt.verify(token, 'secret_ecom');
+            req.user = data.user;
+            next();
+        } catch(error){
+            res.status(400).send({errors: "Please authenticate using valid login"});
+        }
+    }
+})
+
+app.post('/addtocart', fetchUser,async(req, res)=>{
+    console.log("Added", req.body.itemId);
+    let userData = await User.findOne({_id: req.user.id})
+    userData.cartData[req.body.itemId] += 1;
+    await User.findByIdAndUpdate({_id: req.user.id}, {cartData: userData.cartData});
+    res.json({success: true, message: "Item added to cart"})
+})
+
+app.post('/removefromcart', fetchUser,async(req, res)=>{
+    console.log("Removed", req.body.itemId);
+    let userData = await User.findOne({_id: req.user.id})
+    if(userData.cartData[req.body.itemId] > 0)
+    userData.cartData[req.body.itemId] -= 1;
+    await User.findByIdAndUpdate({_id: req.user.id}, {cartData: userData.cartData});
+    res.json({success: true, message: "Item removed from cart"})
+})
+
+app.post('/getcart', fetchUser,async (req, res)=> {
+    console.log("Get cart items");
+    let userData = await User.findOne({_id: req.user.id});
+    res.json({success: true, cartData: userData.cartData})
+})
+
 
 app.listen(port, (error) => {
     if (error) {
