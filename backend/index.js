@@ -9,8 +9,15 @@ const cors = require("cors");
 const dotenv = require("dotenv")
 dotenv.config();
 
+const path = require("path");
+const __dirname = path.resolve();
+
 app.use(express.json());
 app.use(cors());
+
+app.use(express.static(path.join(__dirname, '/frontend/dist')));
+
+
 
 //database connection
 mongoose.connect(process.env.MONGO_URL);
@@ -237,6 +244,10 @@ app.post('/getcart', fetchUser,async (req, res)=> {
     console.log("Get cart items");
     let userData = await User.findOne({_id: req.user.id});
     res.json({success: true, cartData: userData.cartData})
+})
+
+app.get('*', (req, res)=> {
+    res.sendFile(path.join(__dirname, '/frontend/dist/index.html'));
 })
 
 
