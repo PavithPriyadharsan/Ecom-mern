@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 //database connection
-mongoose.connect("mongodb+srv://pavith:ecom-mern@cluster0.qwchbcw.mongodb.net/ecom-mern?retryWrites=true&w=majority&appName=Cluster0");
+mongoose.connect("");
 
 
 app.get("/", (req, res) => {
