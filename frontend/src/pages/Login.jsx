@@ -15,7 +15,7 @@ const Login = () => {
 
    const login = async() => {
     let responseData;
-    await fetch('/login',{
+    await fetch('http://localhost:4000/login',{
       method: "POST",
       headers: {
         Accept: "application/formData",
