@@ -1,7 +1,16 @@
+import { useEffect, useState } from "react";
 import LATEST from "../assets/latest";
 import Item from "./Item";
 
 const NewCollections = () => {
+
+  // const [new_collection, setNew_collection] = useState([]);
+
+  // useEffect(()=> {
+  //   fetch("http://localhost:4000/newcollections").then((response)=> response.json())
+  //   .then((data)=> setNew_collection(data))
+  // })
+
   return (
     <section className="bg-primary">
     <div className="max_padd_container py-12 xl-py-28 xl:w-[88%]">
