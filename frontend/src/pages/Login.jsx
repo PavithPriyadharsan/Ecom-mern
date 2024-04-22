@@ -15,7 +15,7 @@ const Login = () => {
 
    const login = async() => {
     let responseData;
-    await fetch('http://localhost:4000/login',{
+    await fetch('https://ecom-mern-five.vercel.app/login',{
       method: "POST",
       headers: {
         Accept: "application/formData",
@@ -36,7 +36,7 @@ const Login = () => {
   }
   const signup = async() => {
     let responseData;
-    await fetch('http://localhost:4000/signup',{
+    await fetch('https://ecom-mern-five.vercel.app/signup',{
       method: "POST",
       headers: {
         Accept: "application/formData",
